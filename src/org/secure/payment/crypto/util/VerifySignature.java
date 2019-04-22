@@ -11,7 +11,7 @@ import java.security.spec.X509EncodedKeySpec;
 import java.util.List;
 
 public class VerifySignature {
-	private String path = "Asymmetric/publicKey";
+	private String path = "key/asymmetric/publicKey";
 	
 	public VerifySignature(){
 		

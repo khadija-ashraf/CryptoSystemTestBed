@@ -13,7 +13,7 @@ import javax.crypto.spec.SecretKeySpec;
 public class GenerateSymmetricKey {
 
 	private SecretKeySpec secretKey;
-	private String path = "Symmetric/secretKey";
+	private String path = "key/symmetric/secretKey";
 	
 	public GenerateSymmetricKey(int length, String algorithm)
 			throws UnsupportedEncodingException, NoSuchAlgorithmException,

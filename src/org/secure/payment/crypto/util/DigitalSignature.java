@@ -18,7 +18,7 @@ import javax.swing.JOptionPane;
 
 public class DigitalSignature {
 	private List<byte[]> list;
-	private String path = "Asymmetric/privateKey";
+	private String path = "key/asymmetric/privateKey";
 	//The constructor of Message class builds the list that will be written to the file. 
 	//The list consists of the message and the signature.
 	public DigitalSignature(){

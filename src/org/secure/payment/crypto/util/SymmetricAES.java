@@ -16,7 +16,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 public class SymmetricAES {
 	static Cipher cipher;
-	private String path = "Symmetric/secretKey";
+	private String path = "key/symmetric/secretKey";
 
 	public static void main(String[] args) throws Exception {
 		

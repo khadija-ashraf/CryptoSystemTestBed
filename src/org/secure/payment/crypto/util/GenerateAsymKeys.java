@@ -51,8 +51,8 @@ public class GenerateAsymKeys {
 		try {
 			gk = new GenerateAsymKeys(1024);
 			gk.createKeys();
-			gk.writeToFile("Asymmetric/publicKey"+clientId, gk.getPublicKey().getEncoded());
-			gk.writeToFile("Asymmetric/privateKey"+clientId, gk.getPrivateKey().getEncoded());
+			gk.writeToFile("key/asymmetric/publicKey"+clientId, gk.getPublicKey().getEncoded());
+			gk.writeToFile("key/asymmetric/privateKey"+clientId, gk.getPrivateKey().getEncoded());
 		} catch (NoSuchAlgorithmException | NoSuchProviderException e) {
 			System.err.println(e.getMessage());
 		} catch (IOException e) {
@@ -65,8 +65,8 @@ public class GenerateAsymKeys {
 		try {
 			gk = new GenerateAsymKeys(1024);
 			gk.createKeys();
-			gk.writeToFile("Asymmetric/publicKey", gk.getPublicKey().getEncoded());
-			gk.writeToFile("Asymmetric/privateKey", gk.getPrivateKey().getEncoded());
+			gk.writeToFile("key/asymmetric/publicKey", gk.getPublicKey().getEncoded());
+			gk.writeToFile("key/asymmetric/privateKey", gk.getPrivateKey().getEncoded());
 		} catch (NoSuchAlgorithmException | NoSuchProviderException e) {
 			System.err.println(e.getMessage());
 		} catch (IOException e) {
