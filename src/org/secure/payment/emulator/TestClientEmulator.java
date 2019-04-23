@@ -75,9 +75,6 @@ public class TestClientEmulator {
 			
 			setUpPhaseOf4Client1Router(clientHandler, clientHandler2,
 					clientHandler3, clientHandler4);
-			
-			/*setUpPhaseOf4Client6Router(clientHandler, clientHandler2,
-					clientHandler3, clientHandler4);*/
 
 			sendControlInfo(clientHandler, clientHandler2, clientHandler3,
 					clientHandler4);
@@ -85,20 +82,6 @@ public class TestClientEmulator {
 			addOneTrnxCycle(TRANSACTION1, clientHandler, clientHandler2,
 					clientHandler3, clientHandler4);
 
-			/*Thread.sleep(50000);
-
-			addOneTrnxCycle(TRANSACTION2, clientHandler, clientHandler2,
-					clientHandler3, clientHandler4);
-
-			Thread.sleep(50000);
-
-			addOneTrnxCycle(TRANSACTION3, clientHandler, clientHandler2,
-					clientHandler3, clientHandler4);
-
-			Thread.sleep(50000);
-
-			addOneTrnxCycle(TRANSACTION4, clientHandler, clientHandler2,
-					clientHandler3, clientHandler4);*/
 
 		} catch (InterruptedException e) {
 			e.printStackTrace();

@@ -129,7 +129,7 @@ public class ClientHandler {
 		this.csvFile = this.getClientId()+"_legder"+".csv";
 		fileWriter = new FileWriter(csvFile);
 		//for header
-        CSVUtils.writeLine(fileWriter, Arrays.asList("Record", "Hashcode", "TransactionId"));
+        CSVUtils.writeLine(fileWriter, Arrays.asList("TransactionId", "Amount", "Receiver", "Sender", "Record", "DigitalSignature",));
 	}
 	
 	public void createThreadsForAllConn() throws IOException, InterruptedException {
@@ -432,10 +432,9 @@ public class ClientHandler {
 									e.printStackTrace();
 								}
 								
-								
 								sendEmailToConsumer(receivedPacket, trnxString);
 								
-								System.out.println(trnxString);
+								System.out.println("Notified Consumer.");
 								// Add transaction into ledger.
 								this.addTrnxToLedger(trnxString, receivedPacket.getTransactionId());
 								
@@ -481,12 +480,12 @@ public class ClientHandler {
 								} catch (Exception e) {
 									e.printStackTrace();
 								}
-								System.out.println(trnxString);
-
+								sendEmailToMerchant(receivedPacket, trnxString);
+								System.out.println("Notified Merchant.");
+								
 								// Add transaction into ledger.
 								this.addTrnxToLedger(trnxString, receivedPacket.getTransactionId());
 								
-								//SendEmail.mail("Hello", "This is body");
 							} else {
 								System.out.println("Signature failed: ");
 							}
@@ -529,6 +528,7 @@ public class ClientHandler {
 		}
 
 		private void sendEmailToConsumer(DataPacket receivedPacket, String trnxString) {
+			String receipientEmail = "khadija.csedu@gmail.com";
 			int amountIdx = trnxString.indexOf('$');
 			int amountIdxEnd = trnxString.indexOf('$');
 			while(trnxString.charAt(amountIdxEnd) != ' ') {
@@ -540,12 +540,33 @@ public class ClientHandler {
 			String subject = "Your Payment Scheduled";
 			String amountStr = trnxString.substring(amountIdx, amountIdxEnd);
 			String emailBody = "Payment Info:\n";
-			emailBody += "Total amount: "+amountStr;
-			emailBody += "\nReceiver: "+receiver;
+			emailBody += "\nTotal amount: "+amountStr;
+			emailBody += "\nReceiver:  "+receiver;
 			emailBody += "\nTransaction ID: "+receivedPacket.getTransactionId();
 			emailBody += "\nPayment Posting Date: "+new Date();
 			
-			SendEmail.mail(subject, emailBody);
+			SendEmail.mail(subject, emailBody, receipientEmail);
+		}
+		
+		private void sendEmailToMerchant(DataPacket receivedPacket, String trnxString) {
+			String receipientEmail = "mtest7587@gmail.com"; // pass:mtest7587123456
+			int amountIdx = trnxString.indexOf('$');
+			int amountIdxEnd = trnxString.indexOf('$');
+			while(trnxString.charAt(amountIdxEnd) != ' ') {
+				amountIdxEnd++;
+			}
+			String[] strArr = trnxString.split(" ");
+			String sender = strArr[0];
+			
+			String subject = "Your Selling Receipt";
+			String amountStr = trnxString.substring(amountIdx, amountIdxEnd);
+			String emailBody = "Payment Info:\n";
+			emailBody += "\nTotal amount: "+amountStr;
+			emailBody += "\nSender:  "+sender;
+			emailBody += "\nTransaction ID: "+receivedPacket.getTransactionId();
+			emailBody += "\nPayment Posting Date: "+new Date();
+			
+			SendEmail.mail(subject, emailBody, receipientEmail);
 		}
 		
 		private void askApprovalToMerchantBank(DataPacket transactionPacket)

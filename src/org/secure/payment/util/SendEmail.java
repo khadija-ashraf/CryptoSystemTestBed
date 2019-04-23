@@ -17,7 +17,7 @@ public class SendEmail {
 
 	}
 
-	public static void mail(String subject, String text) {
+	public static void mail(String subject, String text, String receipient) {
 		final String SSL_FACTORY = "javax.net.ssl.SSLSocketFactory";
 		// Get a Properties object
 		Properties props = System.getProperties();
@@ -27,7 +27,7 @@ public class SendEmail {
 		props.setProperty("mail.smtp.port", "465");
 		props.setProperty("mail.smtp.socketFactory.port", "465");
 		props.put("mail.smtp.auth", "true");
-		props.put("mail.debug", "true");
+		//props.put("mail.debug", "true");
 		props.put("mail.store.protocol", "pop3");
 		props.put("mail.transport.protocol", "smtp");
 		final String username = "khadija.shadow06@gmail.com";//
@@ -47,12 +47,11 @@ public class SendEmail {
 			// -- Set the FROM and TO fields --
 			msg.setFrom(new InternetAddress("khadija.shadow06@gmail.com"));
 			msg.setRecipients(Message.RecipientType.TO,
-					InternetAddress.parse("khadija.csedu@gmail.com", false));
+					InternetAddress.parse(receipient, false));
 			msg.setSubject(subject);
 			msg.setText(text);
 			msg.setSentDate(new Date());
 			Transport.send(msg);
-			System.out.println("Message sent.");
 		} catch (MessagingException e) {
 			System.out.println("Error Occured cause: " + e);
 		}
