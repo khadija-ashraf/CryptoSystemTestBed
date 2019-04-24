@@ -73,6 +73,11 @@ public class Utils {
 		return encryptedText;
 	}
 	
+	public static byte[] convertBase64ToString(String encryptedText){
+		Base64.Decoder decoder = Base64.getDecoder();
+		return decoder.decode(encryptedText);
+	}
+	
 	public static boolean selectedReceiverConflicted(Integer receiverClientId) {
 
 		if (senderClientId != null

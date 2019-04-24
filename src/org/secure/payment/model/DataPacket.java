@@ -25,7 +25,7 @@ public class DataPacket implements Serializable, Cloneable {
 	private byte[] data;
 	
 	private String hashcode;
-	private byte[] digitalSignature;
+	private String digitalSignature;
 	private String cipherText;
 	private String encryptedSecretKey;
 	
@@ -100,7 +100,7 @@ public class DataPacket implements Serializable, Cloneable {
 		this.receiverClientId = receiverClientId;
 		this.data = data;
 		this.transactionId = transactionId;
-		this.digitalSignature = digitalSign;
+		this.digitalSignature = Utils.convertToBase64(digitalSign);
 		this.cipherText = cipherText;
 	}
 	
@@ -129,8 +129,8 @@ public class DataPacket implements Serializable, Cloneable {
 	public String toString() {
 		return  ";\nPacketId= " + getPacketId()
 				+ ";\nTranxId= " + getTransactionId()
-				+ ";\nDigitalSignature= " + getDigitalSignature()
-				+ ";\nCipher= " + getCipherText()
+				+ ";\nCipher= " + getDigitalSignature()
+				//+ ";\nCipher= " + getCipherText()
 				+ ";\nEncryptedSecretKey= " + getEncryptedSecretKey();
 	}
 
@@ -234,11 +234,11 @@ public class DataPacket implements Serializable, Cloneable {
 		this.hashcode = hashcode;
 	}
 
-	public byte[] getDigitalSignature() {
+	public String getDigitalSignature() {
 		return digitalSignature;
 	}
 
-	public void setDigitalSignature(byte[]  cipherText) {
+	public void setDigitalSignature(String  cipherText) {
 		this.digitalSignature = cipherText;
 	}
 

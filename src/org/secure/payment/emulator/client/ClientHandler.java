@@ -351,14 +351,17 @@ public class ClientHandler {
 									+ ";\nDestId= "+this.clientId
 									+ receivedPacket.toString());
 
+							// Decrypt
 							VerifySignature verifySig = new VerifySignature();
+							
+							byte[] digSign = Utils.convertBase64ToString(receivedPacket.getDigitalSignature());
 							boolean sigVarified = verifySig.verifySignature(
 									receivedPacket.getData(),
-									receivedPacket.getDigitalSignature(),
+									digSign,
 									receivedPacket.getSourceId());
 
 							if (sigVarified) {
-								System.out.println("Signature verified : "+receivedPacket.getPacketType());
+								System.out.println("Signature verified for: "+receivedPacket.getPacketType());
 								askApprovalToMerchantBank(receivedPacket);
 
 							} else {
@@ -375,14 +378,17 @@ public class ClientHandler {
 									+ ";\nDestId= "+this.clientId
 									+ receivedPacket.toString());
 							
+							// Decrypt
 							VerifySignature verifySig = new VerifySignature();
+							
+							byte[] digSign = Utils.convertBase64ToString(receivedPacket.getDigitalSignature());
 							boolean sigVarified = verifySig.verifySignature(
 									receivedPacket.getData(),
-									receivedPacket.getDigitalSignature(),
+									digSign,
 									receivedPacket.getSourceId());
 
 							if (sigVarified) {
-								System.out.println("Signature verified : "+receivedPacket.getPacketType());
+								System.out.println("Signature verified for: "+receivedPacket.getPacketType());
 								askApprovalToConsumerBank(receivedPacket);
 
 							} else {
@@ -407,13 +413,15 @@ public class ClientHandler {
 							
 							// Decrypt
 							VerifySignature verifySig = new VerifySignature();
+							
+							byte[] digSign = Utils.convertBase64ToString(receivedPacket.getDigitalSignature());
 							boolean sigVarified = verifySig.verifySignature(
 									receivedPacket.getData(),
-									receivedPacket.getDigitalSignature(),
+									digSign,
 									receivedPacket.getSourceId());
 
 							if (sigVarified) {
-								System.out.println("Signature verified : "+receivedPacket.getPacketType());
+								System.out.println("Signature verified for: "+receivedPacket.getPacketType());
 								
 								sendVerificationToReceiver(receivedPacket);
 								
@@ -433,7 +441,7 @@ public class ClientHandler {
 									e.printStackTrace();
 								}
 								
-								//sendEmailToConsumer(receivedPacket, trnxString);
+								sendEmailToConsumer(receivedPacket, trnxString);
 								
 								System.out.println("Notified Consumer.");
 								// Add transaction into ledger.
@@ -454,13 +462,15 @@ public class ClientHandler {
 							
 							// Decrypt
 							VerifySignature verifySig = new VerifySignature();
+							
+							byte[] digSign = Utils.convertBase64ToString(receivedPacket.getDigitalSignature());
 							boolean sigVarified = verifySig.verifySignature(
 									receivedPacket.getData(),
-									receivedPacket.getDigitalSignature(),
+									digSign,
 									receivedPacket.getSourceId());
 
 							if (sigVarified) {
-								System.out.println("Signature verified : "+receivedPacket.getPacketType());
+								System.out.println("Signature verified for: "+receivedPacket.getPacketType());
 								
 								if(checkNaddProcessedTrnx(receivedPacket)){
 									continue;
@@ -481,7 +491,7 @@ public class ClientHandler {
 								} catch (Exception e) {
 									e.printStackTrace();
 								}
-								//sendEmailToMerchant(receivedPacket, trnxString);
+								sendEmailToMerchant(receivedPacket, trnxString);
 								System.out.println("Notified Merchant.");
 								
 								// Add transaction into ledger.
@@ -492,11 +502,11 @@ public class ClientHandler {
 							}
 							
 							// Calculate and show throughout
-							//receivedPacket.setTravelEndTime(System.currentTimeMillis());
-							//long totalTravelTimeInMills = receivedPacket.getTravelEndTime() - receivedPacket.getTravelStartTime();
-							//int totalTransmittedBits = receivedPacket.getTotalTrasnmittedBits();
-							//String throughputStr = String.format("%.2f", totalTransmittedBits/(double)totalTravelTimeInMills);
-							//System.out.println("\n[[THROUGHPUT : TRANSACTIONID]] :: "+throughputStr+" bytes/mills" +" || "+receivedPacket.getTransactionId());
+							receivedPacket.setTravelEndTime(System.currentTimeMillis());
+							long totalTravelTimeInMills = receivedPacket.getTravelEndTime() - receivedPacket.getTravelStartTime();
+							int totalTransmittedBits = receivedPacket.getTotalTrasnmittedBits();
+							String throughputStr = String.format("%.2f", totalTransmittedBits/(double)totalTravelTimeInMills);
+							System.out.println("\n[[THROUGHPUT : TRANSACTIONID]] :: "+throughputStr+" bytes/mills" +" || "+receivedPacket.getTransactionId());
 							
 						} else {
 							for (ClientConnection connection : connectionList) {
@@ -586,16 +596,16 @@ public class ClientHandler {
 			
 			// encrypt data with signature
 			DigitalSignature message = new DigitalSignature();
-			byte[] cipherText = null;
+			byte[] digitalSign = null;
 			try {
-				cipherText = message.sign(transactionPacket.getData(), this.clientId);
+				digitalSign = message.sign(transactionPacket.getData(), this.clientId);
 			} catch (InvalidKeyException e) {
 				e.printStackTrace();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			
-			approvalPacket.setDigitalSignature(cipherText);
+			approvalPacket.setDigitalSignature(Utils.convertToBase64(digitalSign));
 			SecretKey secretKey = new SymmetricAES().readSecretKeyFromFile(this.clientId);
 			approvalPacket.setEncryptedSecretKey(Utils.convertToBase64(secretKey.getEncoded()));
 
@@ -622,18 +632,22 @@ public class ClientHandler {
 					+ (approvalPacket.getData().length) * connectionList.size());
 			// encrypt data with signature
 			DigitalSignature message = new DigitalSignature();
-			byte[] cipherText = null;
+			byte[] digitalSign = null;
 			try {
-				cipherText = message.sign(transactionPacket.getData(), this.clientId);
+				digitalSign = message.sign(transactionPacket.getData(), this.clientId);
 			} catch (InvalidKeyException e) {
 				e.printStackTrace();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			
-			approvalPacket.setDigitalSignature(cipherText);
-			SecretKey secretKey = new SymmetricAES().readSecretKeyFromFile(this.clientId);
-			approvalPacket.setEncryptedSecretKey(Utils.convertToBase64(secretKey.getEncoded()));
+			approvalPacket.setDigitalSignature(Utils.convertToBase64(digitalSign));
+			// NOTE: Because the verfication packet is sent to the merchant bank from consumer bank
+			// and they both share the same secret key, 
+			// so the encrypted secret key field will be the same
+			
+			//SecretKey secretKey = new SymmetricAES().readSecretKeyFromFile(this.clientId);
+			//approvalPacket.setEncryptedSecretKey(Utils.convertToBase64(secretKey.getEncoded()));
 			
 			for (ClientConnection connection : connectionList) {
 				semaphore.acquire();
@@ -658,16 +672,16 @@ public class ClientHandler {
 					+ (verificationPacket.getData().length) * connectionList.size());
 			// encrypt data with signature
 			DigitalSignature message = new DigitalSignature();
-			byte[] cipherText = null;
+			byte[] digitalSign = null;
 			try {
-				cipherText = message.sign(approvalPacket.getData(), this.clientId);
+				digitalSign = message.sign(approvalPacket.getData(), this.clientId);
 			} catch (InvalidKeyException e) {
 				e.printStackTrace();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			
-			verificationPacket.setDigitalSignature(cipherText);
+			verificationPacket.setDigitalSignature(Utils.convertToBase64(digitalSign));
 			
 			SecretKey secretKey = new SymmetricAES().readSecretKeyFromFile(this.clientId);
 			verificationPacket.setEncryptedSecretKey(Utils.convertToBase64(secretKey.getEncoded()));
@@ -703,7 +717,7 @@ public class ClientHandler {
 			return false;
 		}
 		
-		private void addTrnxToLedger(String tranxString, long tranxId, byte[] digitalSignature) throws IOException, NoSuchAlgorithmException, NoSuchPaddingException {
+		private void addTrnxToLedger(String tranxString, long tranxId, String digitalSignature) throws IOException, NoSuchAlgorithmException, NoSuchPaddingException {
 			//"TransactionId", "Amount", "Record", "DigitalSignature")
 			int amountIdx = tranxString.indexOf('$');
 			int amountIdxEnd = tranxString.indexOf('$');
@@ -715,7 +729,7 @@ public class ClientHandler {
 			CSVUtils.writeLine(
 					fileWriter,
 					Arrays.asList(String.valueOf(tranxId), amountStr, tranxString,
-							Utils.convertToBase64(digitalSignature)));
+							digitalSignature));
 			fileWriter.flush();
 		}
 		/*private void addTrnxToLedger (DataPacket receivedPacket) throws IOException {

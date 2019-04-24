@@ -79,7 +79,7 @@ public class TestClientEmulator {
 			sendControlInfo(clientHandler, clientHandler2, clientHandler3,
 					clientHandler4);
 
-			addOneTrnxCycle(TRANSACTION1, clientHandler, clientHandler2,
+			addOneTrnxCycle(TRANSACTION4, clientHandler, clientHandler2,
 					clientHandler3, clientHandler4);
 
 
