@@ -6,6 +6,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 import java.util.Random;
 
@@ -66,6 +67,12 @@ public class Utils {
 		consumerBankClientId = randomConsumerBankClient;
 	}
 
+	public static String convertToBase64(byte[] encryptedByte) {
+		Base64.Encoder encoder = Base64.getEncoder();
+		String encryptedText = encoder.encodeToString(encryptedByte);
+		return encryptedText;
+	}
+	
 	public static boolean selectedReceiverConflicted(Integer receiverClientId) {
 
 		if (senderClientId != null

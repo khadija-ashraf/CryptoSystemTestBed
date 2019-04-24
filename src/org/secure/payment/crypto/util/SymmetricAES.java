@@ -14,6 +14,8 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.secure.payment.util.Utils;
+
 public class SymmetricAES {
 	static Cipher cipher;
 	private String path = "key/symmetric/secretKey";
@@ -50,10 +52,10 @@ public class SymmetricAES {
 			throws Exception {
 		cipher.init(Cipher.ENCRYPT_MODE, secretKey);
 		byte[] encryptedByte = cipher.doFinal(plainText);
-		Base64.Encoder encoder = Base64.getEncoder();
-		String encryptedText = encoder.encodeToString(encryptedByte);
-		return encryptedText;
+		return Utils.convertToBase64(encryptedByte);
 	}
+
+
 
 	public String decrypt(String encryptedText, SecretKey secretKey)
 			throws Exception {

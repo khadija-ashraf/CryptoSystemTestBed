@@ -129,7 +129,7 @@ public class ClientHandler {
 		this.csvFile = this.getClientId()+"_legder"+".csv";
 		fileWriter = new FileWriter(csvFile);
 		//for header
-        CSVUtils.writeLine(fileWriter, Arrays.asList("TransactionId", "Amount", "Receiver", "Sender", "Record", "DigitalSignature",));
+        CSVUtils.writeLine(fileWriter, Arrays.asList("TransactionId", "Amount", "Record", "DigitalSignature"));
 	}
 	
 	public void createThreadsForAllConn() throws IOException, InterruptedException {
@@ -432,11 +432,11 @@ public class ClientHandler {
 									e.printStackTrace();
 								}
 								
-								sendEmailToConsumer(receivedPacket, trnxString);
+								//sendEmailToConsumer(receivedPacket, trnxString);
 								
 								System.out.println("Notified Consumer.");
 								// Add transaction into ledger.
-								this.addTrnxToLedger(trnxString, receivedPacket.getTransactionId());
+								this.addTrnxToLedger(trnxString, receivedPacket.getTransactionId(), receivedPacket.getDigitalSignature());
 								
 							} else {
 								System.out.println("Signature failed: ");
@@ -480,11 +480,11 @@ public class ClientHandler {
 								} catch (Exception e) {
 									e.printStackTrace();
 								}
-								sendEmailToMerchant(receivedPacket, trnxString);
+								//sendEmailToMerchant(receivedPacket, trnxString);
 								System.out.println("Notified Merchant.");
 								
 								// Add transaction into ledger.
-								this.addTrnxToLedger(trnxString, receivedPacket.getTransactionId());
+								this.addTrnxToLedger(trnxString, receivedPacket.getTransactionId(), receivedPacket.getDigitalSignature());
 								
 							} else {
 								System.out.println("Signature failed: ");
@@ -695,13 +695,19 @@ public class ClientHandler {
 			return false;
 		}
 		
-		private void addTrnxToLedger (String tranxString, long tranxId) throws IOException {
-			String hashCode = Utils.getSHA256HashCode(tranxString);
-			
+		private void addTrnxToLedger(String tranxString, long tranxId, byte[] digitalSignature) throws IOException, NoSuchAlgorithmException, NoSuchPaddingException {
+			//"TransactionId", "Amount", "Record", "DigitalSignature")
+			int amountIdx = tranxString.indexOf('$');
+			int amountIdxEnd = tranxString.indexOf('$');
+			while(tranxString.charAt(amountIdxEnd) != ' ') {
+				amountIdxEnd++;
+			}
+			String amountStr = tranxString.substring(amountIdx, amountIdxEnd);
+
 			CSVUtils.writeLine(
 					fileWriter,
-					Arrays.asList(tranxString, hashCode,
-							String.valueOf(tranxId)));
+					Arrays.asList(String.valueOf(tranxId), amountStr, tranxString,
+							Utils.convertToBase64(digitalSignature)));
 			fileWriter.flush();
 		}
 		/*private void addTrnxToLedger (DataPacket receivedPacket) throws IOException {
