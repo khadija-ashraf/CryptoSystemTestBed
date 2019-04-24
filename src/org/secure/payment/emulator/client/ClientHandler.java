@@ -30,6 +30,7 @@ import org.secure.payment.model.TCPConnectionDetails;
 import org.secure.payment.util.CSVUtils;
 import org.secure.payment.util.SendEmail;
 import org.secure.payment.util.Utils;
+
 import java.util.Date;
 
 public class ClientHandler {
@@ -344,10 +345,10 @@ public class ClientHandler {
 						if (receivedPacket.getPacketType().equals(PacketType.TRANSACTION)
 								&& clientType.equals(ClientType.RECEIVER)) {
 							
-							System.out.println("\n[PacketType: "
-									+ receivedPacket.getPacketType() + "] "
-									+ "SourceId= "+receivedPacket.getSourceId()
-									+ "; DestId= "+this.clientId
+							System.out.println("\n[[PacketType: "
+									+ receivedPacket.getPacketType() + "]] "
+									+ "\nSourceId= "+receivedPacket.getSourceId()
+									+ ";\nDestId= "+this.clientId
 									+ receivedPacket.toString());
 
 							VerifySignature verifySig = new VerifySignature();
@@ -368,10 +369,10 @@ public class ClientHandler {
 						} else if (receivedPacket.getPacketType().equals(PacketType.APPROVAL_REQUEST)
 								&& clientType.equals(ClientType.MERCHANT_BANK)) {
 							
-							System.out.println("\n[PacketType: "
-									+ receivedPacket.getPacketType() + "] "
-									+ "SourceId= "+receivedPacket.getSourceId()
-									+ "; DestId= "+this.clientId
+							System.out.println("\n[[PacketType: "
+									+ receivedPacket.getPacketType() + "]] "
+									+ "\nSourceId= "+receivedPacket.getSourceId()
+									+ ";\nDestId= "+this.clientId
 									+ receivedPacket.toString());
 							
 							VerifySignature verifySig = new VerifySignature();
@@ -393,10 +394,10 @@ public class ClientHandler {
 						else if (receivedPacket.getPacketType().equals(PacketType.APPROVAL_REQUEST_RELAY)
 								&& clientType.equals(ClientType.CONSUMER_BANK)) {
 							
-							System.out.println("\n[PacketType: "
-									+ receivedPacket.getPacketType() + "] "
-									+ "SourceId= "+receivedPacket.getSourceId()
-									+ "; DestId= "+this.clientId
+							System.out.println("\n[[PacketType: "
+									+ receivedPacket.getPacketType() + "]] "
+									+ "\nSourceId= "+receivedPacket.getSourceId()
+									+ ";\nDestId= "+this.clientId
 									+ receivedPacket.toString());
 							
 							// If consumer bank finds the transaction valid then,
@@ -445,10 +446,10 @@ public class ClientHandler {
 						} else if (receivedPacket.getPacketType().equals(PacketType.VERIFICATION)
 							&& clientType.equals(ClientType.MERCHANT_BANK)) {
 							
-							System.out.println("\n[PacketType: "
-									+ receivedPacket.getPacketType() + "] "
-									+ "SourceId= "+receivedPacket.getSourceId()
-									+ "; DestId= "+this.clientId
+							System.out.println("\n[[PacketType: "
+									+ receivedPacket.getPacketType() + "]] "
+									+ "\nSourceId= "+receivedPacket.getSourceId()
+									+ ";\nDestId= "+this.clientId
 									+ receivedPacket.toString());
 							
 							// Decrypt
@@ -570,8 +571,7 @@ public class ClientHandler {
 		}
 		
 		private void askApprovalToMerchantBank(DataPacket transactionPacket)
-				throws InterruptedException, IOException,
-				CloneNotSupportedException {
+				throws Exception {
 		
 			DataPacket approvalPacket = (DataPacket) transactionPacket.clone(); 
 			
@@ -596,7 +596,9 @@ public class ClientHandler {
 			}
 			
 			approvalPacket.setDigitalSignature(cipherText);
-			
+			SecretKey secretKey = new SymmetricAES().readSecretKeyFromFile(this.clientId);
+			approvalPacket.setEncryptedSecretKey(Utils.convertToBase64(secretKey.getEncoded()));
+
 			for (ClientConnection connection : connectionList) {
 				semaphore.acquire();
 				connection.getOutputStream().writeObject(approvalPacket);
@@ -606,8 +608,7 @@ public class ClientHandler {
 		}
 		
 		private void askApprovalToConsumerBank(DataPacket transactionPacket)
-				throws InterruptedException, IOException,
-				CloneNotSupportedException {
+				throws NoSuchAlgorithmException, NoSuchPaddingException, Exception {
 		
 			DataPacket approvalPacket = (DataPacket) transactionPacket.clone(); 
 			
@@ -631,6 +632,9 @@ public class ClientHandler {
 			}
 			
 			approvalPacket.setDigitalSignature(cipherText);
+			SecretKey secretKey = new SymmetricAES().readSecretKeyFromFile(this.clientId);
+			approvalPacket.setEncryptedSecretKey(Utils.convertToBase64(secretKey.getEncoded()));
+			
 			for (ClientConnection connection : connectionList) {
 				semaphore.acquire();
 				connection.getOutputStream().writeObject(approvalPacket);
@@ -640,7 +644,7 @@ public class ClientHandler {
 		}
 		
 		private void sendVerificationToReceiver(DataPacket approvalPacket)
-				throws InterruptedException, IOException, CloneNotSupportedException {
+				throws NoSuchAlgorithmException, NoSuchPaddingException, Exception {
 			
 			DataPacket verificationPacket = (DataPacket) approvalPacket.clone(); 
 			
@@ -664,6 +668,10 @@ public class ClientHandler {
 			}
 			
 			verificationPacket.setDigitalSignature(cipherText);
+			
+			SecretKey secretKey = new SymmetricAES().readSecretKeyFromFile(this.clientId);
+			verificationPacket.setEncryptedSecretKey(Utils.convertToBase64(secretKey.getEncoded()));
+			
 			for (ClientConnection connection : connectionList) {
 				semaphore.acquire();
 				connection.getOutputStream().writeObject(verificationPacket);

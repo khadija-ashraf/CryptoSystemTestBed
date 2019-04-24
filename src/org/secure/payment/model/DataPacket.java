@@ -6,6 +6,8 @@ import java.security.NoSuchAlgorithmException;
 
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
+import javax.rmi.CORBA.Util;
+import javax.xml.bind.DatatypeConverter;
 
 import org.secure.payment.crypto.util.DigitalSignature;
 import org.secure.payment.crypto.util.SymmetricAES;
@@ -25,6 +27,7 @@ public class DataPacket implements Serializable, Cloneable {
 	private String hashcode;
 	private byte[] digitalSignature;
 	private String cipherText;
+	private String encryptedSecretKey;
 	
 	long transactionId;
 	long packetId = Utils.generateRandomId();
@@ -81,7 +84,7 @@ public class DataPacket implements Serializable, Cloneable {
 			SecretKey secretKey = aes.readSecretKeyFromFile(sourceId);
 
 			cipherText = aes.encrypt(data, secretKey);
-
+			this.encryptedSecretKey = Utils.convertToBase64(secretKey.getEncoded());
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
 		} catch (NoSuchPaddingException e) {
@@ -124,13 +127,11 @@ public class DataPacket implements Serializable, Cloneable {
 	}
 
 	public String toString() {
-		return  "; consumerId= " + getSenderClientId()
-				+ "; packetId= " + getPacketId()
-				+ "; tranxId= " + getTransactionId()
-				+ "; Hash= " + getHashcode()
-				+ "; digitalSig= " + getDigitalSignature()
-				+ "; cipher= " + getCipherText()
-				+ "; Data= " + getData();
+		return  ";\nPacketId= " + getPacketId()
+				+ ";\nTranxId= " + getTransactionId()
+				+ ";\nDigitalSignature= " + getDigitalSignature()
+				+ ";\nCipher= " + getCipherText()
+				+ ";\nEncryptedSecretKey= " + getEncryptedSecretKey();
 	}
 
 	public Object clone() throws CloneNotSupportedException {
@@ -247,5 +248,13 @@ public class DataPacket implements Serializable, Cloneable {
 
 	public void setCipherText(String cipherText) {
 		this.cipherText = cipherText;
+	}
+
+	public String getEncryptedSecretKey() {
+		return encryptedSecretKey;
+	}
+
+	public void setEncryptedSecretKey(String encryptedSecretKey) {
+		this.encryptedSecretKey = encryptedSecretKey;
 	}
 }
