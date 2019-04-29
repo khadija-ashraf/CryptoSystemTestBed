@@ -560,7 +560,7 @@ public class ClientHandler {
 		}
 		
 		private void sendEmailToMerchant(DataPacket receivedPacket, String trnxString) {
-			String receipientEmail = "mtest7587@gmail.com"; // pass:mtest7587123456
+			String receipientEmail = "test_merchant@gmail.com"; 
 			int amountIdx = trnxString.indexOf('$');
 			int amountIdxEnd = trnxString.indexOf('$');
 			while(trnxString.charAt(amountIdxEnd) != ' ') {

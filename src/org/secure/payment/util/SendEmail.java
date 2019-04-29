@@ -30,8 +30,8 @@ public class SendEmail {
 		//props.put("mail.debug", "true");
 		props.put("mail.store.protocol", "pop3");
 		props.put("mail.transport.protocol", "smtp");
-		final String username = "khadija.shadow06@gmail.com";//
-		final String password = "Khadija@123456";
+		final String username = "test@gmail.com";//
+		final String password = "test";
 		try {
 			Session session = Session.getDefaultInstance(props,
 					new Authenticator() {
@@ -45,7 +45,7 @@ public class SendEmail {
 			Message msg = new MimeMessage(session);
 
 			// -- Set the FROM and TO fields --
-			msg.setFrom(new InternetAddress("khadija.shadow06@gmail.com"));
+			msg.setFrom(new InternetAddress("test@gmail.com"));
 			msg.setRecipients(Message.RecipientType.TO,
 					InternetAddress.parse(receipient, false));
 			msg.setSubject(subject);
